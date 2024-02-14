@@ -33,20 +33,32 @@ public class BatchConfiguration {
                 .dataSource(dataSource)
                 .name("EmployeeProfileReader")
                 .sql("""
-                        select
-                            p.id,
-                            p.first_name,
-                            p.last_name,
-                            p.email,
-                            jh.start_date,
-                            jh.end_date,
-                            jh.job_title,
-                            c.name as company_name,
-                            c.industry,
-                            c.address as company_address
-                        from person p
-                        left join job_history jh on jh.person_id = p.id
-                        left join company c on c.id = jh.company_id;
+                    SELECT
+                      row_to_json(result) AS employee_profile FROM
+                      (
+                        SELECT
+                        p.id AS "personId",
+                        p.first_name as "firstName",
+                        p.last_name as "lastName",
+                        p.email,
+                        json_agg(json_build_object(
+                            'jobHistoryId', jh.id,
+                            'startDate', jh.start_date,
+                            'endDate', jh.end_date,
+                            'jobTitle', jh.job_title,
+                            'companyId', c.id,
+                            'companyName', c.name,
+                            'industry', c.industry,
+                            'address', c.address
+                        )) AS "jobHistory"
+                        FROM person p
+                        LEFT JOIN
+                            job_history jh ON p.id = jh.person_id
+                        LEFT JOIN
+                            company c ON jh.company_id = c.id
+                        GROUP BY
+                            p.id, p.first_name, p.last_name, p.email
+                      ) result;
                         """)
                 .rowMapper(new EmployeeProfileRowMapper())
                 .build();

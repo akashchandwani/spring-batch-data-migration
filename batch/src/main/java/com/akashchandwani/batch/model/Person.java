@@ -11,9 +11,9 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class Person {
-    private Integer id;
+    private Integer personId;
     private String firstName;
     private String lastName;
     private String email;
-    private List<JobHistory> jobHistories;
+    private List<JobHistoryItem> jobHistory;
 }
