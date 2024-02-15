@@ -23,10 +23,10 @@ import javax.sql.DataSource;
 
 @Configuration
 @Slf4j
-public class BatchConfiguration {
+public class BatchJobConfiguration {
 
     @Bean
-    public JdbcCursorItemReader<Person> itemReader(DataSource dataSource) {
+    public JdbcCursorItemReader<Person> reader(DataSource dataSource) {
         return new JdbcCursorItemReaderBuilder<Person>()
                 .dataSource(dataSource)
                 .name("EmployeeProfileReader")
@@ -71,7 +71,7 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public MongoItemWriter<Person> mongoUpsertWriter(MongoTemplate mongoTemplate) {
+    public MongoItemWriter<Person> writer(MongoTemplate mongoTemplate) {
         return new MongoItemWriterBuilder<Person>()
                 .mode(MongoItemWriter.Mode.UPSERT)
                 .template(mongoTemplate)
@@ -80,20 +80,20 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Job importUserJob(JobRepository jobRepository, Step step1, JobCompletionNotificationListener listener) {
-        return new JobBuilder("postgresToMongoDbLoad", jobRepository)
+    public Job job(JobRepository jobRepository, Step step1, JobCompletionNotificationListener listener) {
+        return new JobBuilder("etl", jobRepository)
                 .listener(listener)
                 .start(step1)
                 .build();
     }
 
     @Bean
-    public Step step1(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
-                      JdbcCursorItemReader<Person> reader, MongoItemWriter<Person> mongoUpsertWriter) {
+    public Step step(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
+                      JdbcCursorItemReader<Person> reader, MongoItemWriter<Person> writer) {
         return new StepBuilder("step1", jobRepository)
                 .<Person, Person> chunk(3, transactionManager)
                 .reader(reader)
-                .writer(mongoUpsertWriter)
+                .writer(writer)
                 .build();
     }
 }
