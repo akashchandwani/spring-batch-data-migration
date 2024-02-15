@@ -3,7 +3,6 @@ package com.akashchandwani.batch.configuration;
 import com.akashchandwani.batch.model.Person;
 import com.akashchandwani.batch.model.mappers.EmployeeProfileRowMapper;
 import com.mongodb.client.MongoClient;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -22,7 +21,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@Slf4j
 public class BatchJobConfiguration {
 
     @Bean
@@ -80,14 +78,6 @@ public class BatchJobConfiguration {
     }
 
     @Bean
-    public Job job(JobRepository jobRepository, Step step1, JobCompletionNotificationListener listener) {
-        return new JobBuilder("etl", jobRepository)
-                .listener(listener)
-                .start(step1)
-                .build();
-    }
-
-    @Bean
     public Step step(JobRepository jobRepository, DataSourceTransactionManager transactionManager,
                       JdbcCursorItemReader<Person> reader, MongoItemWriter<Person> writer) {
         return new StepBuilder("step1", jobRepository)
@@ -96,4 +86,13 @@ public class BatchJobConfiguration {
                 .writer(writer)
                 .build();
     }
+
+    @Bean
+    public Job job(JobRepository jobRepository, Step step1, JobCompletionNotificationListener listener) {
+        return new JobBuilder("etl", jobRepository)
+                .listener(listener)
+                .start(step1)
+                .build();
+    }
+
 }
