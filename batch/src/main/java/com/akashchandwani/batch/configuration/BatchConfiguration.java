@@ -2,7 +2,6 @@ package com.akashchandwani.batch.configuration;
 
 import com.akashchandwani.batch.model.Person;
 import com.akashchandwani.batch.model.mappers.EmployeeProfileRowMapper;
-import com.mongodb.MongoNamespace;
 import com.mongodb.client.MongoClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -10,7 +9,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.MongoItemWriter;
 import org.springframework.batch.item.data.builder.MongoItemWriterBuilder;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
